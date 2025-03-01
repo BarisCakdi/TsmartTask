@@ -1,0 +1,8 @@
+﻿namespace TsmartTask.DTOs
+{
+    public class dtoLoginRequest
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+}

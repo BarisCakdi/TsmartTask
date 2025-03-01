@@ -1,0 +1,6 @@
+@TsmartTask_HostAddress = http://localhost:5244
+
+GET {{TsmartTask_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
