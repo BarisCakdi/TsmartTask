@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TsmartTask.Data;
+using TsmartTask.DTOs;
 using TsmartTask.Model;
 
 namespace TsmartTask.Controllers
@@ -41,5 +42,28 @@ namespace TsmartTask.Controllers
             }
             return Ok(product);
         }
+
+        [HttpPost]
+        public IActionResult AddProduct([FromBody] dtoProductAdd productDto)
+        {
+            if (productDto == null)
+            {
+                return BadRequest(new { message = "Geçersiz ürün verisi." });
+            }
+
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Price = productDto.Price,
+                Stock = productDto.Stock,
+                IsDeleted = false 
+            };
+
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+        }
+
     }
 }
