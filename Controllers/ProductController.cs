@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using TsmartTask.Data;
 using TsmartTask.DTOs;
 using TsmartTask.Model;
@@ -101,7 +99,7 @@ namespace TsmartTask.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                return StatusCode(500, "Error updating the product.");
+                return StatusCode(500, "Güncellemede hata oluştu.");
             }
         }
 
