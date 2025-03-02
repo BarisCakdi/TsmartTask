@@ -1,4 +1,4 @@
-
+﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +30,16 @@ namespace TsmartTask
                         ValidAudience = builder.Configuration["JwtSettings:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? string.Empty)),
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            return context.Response.WriteAsJsonAsync(new { message = "Yetkisiz erişim! Lütfen giriş yapınız." });
+                        }
+                    };
                 });
 
             builder.Services.AddScoped<IJwtService, JwtService>();
@@ -57,6 +67,23 @@ namespace TsmartTask
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    await next();
+                }
+                catch (Exception ex)
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+
+                    var errorResponse = new { message = "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyiniz." };
+
+                    await context.Response.WriteAsJsonAsync(errorResponse);
+                }
+            });
 
 
             app.MapControllers();

@@ -22,7 +22,7 @@ namespace TsmartTask.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] dtoLoginRequest request)
         {
-            var user = new User() { Id = 3, Username = "", Password = "" };
+            var user = _context.Users.FirstOrDefault(u => u.Username == request.Username && u.Password == request.Password);
 
             if (user == null)
             {

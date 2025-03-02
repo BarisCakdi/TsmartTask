@@ -6,7 +6,7 @@ using TsmartTask.Model;
 
 namespace TsmartTask.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class ProductController : ControllerBase
@@ -19,19 +19,25 @@ namespace TsmartTask.Controllers
         }
 
         [HttpGet]
-        public List<Product> GetAll()
+        public IActionResult GetAll()
         {
             var products = _context.Products.ToList();
 
-            return products;
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new { message = "Ürün bulunmamaktadır." });
+            }
+
+            return Ok(products);
         }
+
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var product = _context.Products.Find(id);
             if (product == null)
             {
-                return NotFound("Ürün Bulunamadı");
+                return NotFound(new { message = "Bu id sahip ürün bulunmamaktadır." });
             }
             return Ok(product);
         }
