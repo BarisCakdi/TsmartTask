@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using TsmartTask.Data;
 using TsmartTask.Services;
 
 namespace TsmartTask
