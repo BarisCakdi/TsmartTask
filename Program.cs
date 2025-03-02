@@ -1,8 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 using TsmartTask.Data;
 using TsmartTask.Services;
@@ -16,7 +14,6 @@ namespace TsmartTask
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -43,16 +40,24 @@ namespace TsmartTask
                 });
 
             builder.Services.AddScoped<IJwtService, JwtService>();
-
             builder.Services.AddControllersWithViews();
-
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // CORS ayarları
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -63,29 +68,56 @@ namespace TsmartTask
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
             app.Use(async (context, next) =>
             {
-                try
+                if (context.Request.Method == "POST" || context.Request.Method == "PATCH")
                 {
-                    await next();
-                }
-                catch (Exception ex)
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    context.Response.ContentType = "application/json";
+                    if (!context.Request.Headers.ContainsKey("Content-Type"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
+                        context.Response.ContentType = "application/json";
+                        var errorResponse = new
+                        {
+                            message = "Lütfen geçerli bir JSON formatında veri gönderin.",
+                            example = new
+                            {
+                                Name = "Yeni Ürün Adı",
+                                Price = 150.75,
+                                Stock = 100
+                            },
+                            details = "Lütfen Content-Type başlığını 'application/json' olarak ayarladığınızdan emin olun."
+                        };
+                        await context.Response.WriteAsJsonAsync(errorResponse);
+                        return;
+                    }
 
-                    var errorResponse = new { message = "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyiniz." };
-
-                    await context.Response.WriteAsJsonAsync(errorResponse);
+                    if (!context.Request.Headers["Content-Type"].ToString().Contains("application/json"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
+                        context.Response.ContentType = "application/json";
+                        var errorResponse = new
+                        {
+                            message = "Lütfen geçerli bir JSON formatında veri gönderin.",
+                            example = new
+                            {
+                                Name = "Yeni Ürün Adı",
+                                Price = 150.75,
+                                Stock = 100
+                            },
+                            details = "Lütfen Content-Type başlığını 'application/json' olarak ayarladığınızdan emin olun."
+                        };
+                        await context.Response.WriteAsJsonAsync(errorResponse);
+                        return;
+                    }
                 }
+
+                await next();
             });
 
-
+            app.UseHttpsRedirection();
+            app.UseCors("AllowAllOrigins");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
 
             app.Run();
