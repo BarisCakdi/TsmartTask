@@ -39,9 +39,9 @@ Task projesinin swagger olarak canlıda ki versiyonu = https://tsmarttask.barisc
 	ürünü endpointin sonuna yazıp gönderdiğimiz zaman 'softdelete' işlemi gerçekleşmektedir. Veri tabanında mevcut olup ürün listelemede gözükmemektedir.
 
 
--- Bu endpoint'in işlevi ise silinmiş ürünlerin tamamını göstermek için kullanılmaktadır ; https://localhost:7228/api/Product/Get/deleted 
+-- Bu endpoint'in işlevi ise silinmiş ürünlerin tamamını göstermek için kullanılmaktadır ; https://tsmarttask.bariscakdi.com.tr/api/Product/Get/deleted 
 
 
--- Burada ki endpoint silinmiş olan ürünü tekrar listeye eklenmesini sağlamaktadır ; https://localhost:7228/api/Product/PatchRestore/{id} // Endpoint sonuna aktif hale 
+-- Burada ki endpoint silinmiş olan ürünü tekrar listeye eklenmesini sağlamaktadır ; https://tsmarttask.bariscakdi.com.tr/api/Product/PatchRestore/{id} // Endpoint sonuna aktif hale 
 	gelmesini istediğiniz ürünün id'sini yazıp göndermeniz yeterlidir.
 
